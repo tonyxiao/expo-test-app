@@ -1,9 +1,19 @@
 import 'expo-dev-client'
-import { Link, NavigationContainer } from '@react-navigation/native'
+import * as Linking from 'expo-linking'
+import {
+  Link,
+  LinkingOptions,
+  NavigationContainer,
+  useNavigation,
+} from '@react-navigation/native'
 import { StyleSheet, Text, View } from 'react-native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import {
+  createNativeStackNavigator,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack'
 
-function HomeScreen() {
+function HomeScreen(props: NativeStackScreenProps<RootParamList, 'Home'>) {
+  console.log(props)
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Home Screen</Text>
@@ -13,6 +23,8 @@ function HomeScreen() {
 }
 
 function SettingsScreen() {
+  const nav = useNavigation()
+  ;(window as any).nav = nav
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Settings Screen</Text>
@@ -22,9 +34,25 @@ function SettingsScreen() {
 
 const Stack = createNativeStackNavigator()
 
+export type RootParamList = {
+  Home: { bookId: string }
+  Settings: {}
+}
+
+const linking: LinkingOptions<RootParamList> = {
+  prefixes: [Linking.createURL('/')],
+  config: {
+    initialRouteName: 'Home',
+    screens: {
+      Home: ':bookId',
+      Settings: 'settings',
+    },
+  },
+}
+
 export default function App() {
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator>
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
