@@ -94,7 +94,10 @@ const linking: LinkingOptions<RootParamList> = {
         path: ':bookId',
         screens: {
           Tabs: 'tabs',
-          Settings: 'settings',
+          Settings: {
+            path: ':bookId/settings',
+            exact: true,
+          },
         },
       },
       TabDetail: ':bookId/tabs/:tabId',
@@ -120,7 +123,7 @@ export default function App() {
   useReduxDevToolsExtension(navigationRef)
 
   return (
-    <NavigationContainer linking={linking} ref={navigationRef}>
+    <NavigationContainer linking={linking} ref={navigationRef as any}>
       <Stack.Navigator>
         <Stack.Screen name="Home" component={BottomTabsScreen} />
         <Stack.Screen
