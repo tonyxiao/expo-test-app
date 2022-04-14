@@ -117,7 +117,14 @@ const Drawer = createDrawerNavigator()
 
 function DrawerScreen() {
   return (
-    <Drawer.Navigator>
+    <Drawer.Navigator
+      screenOptions={{
+        drawerType: 'permanent',
+        drawerStyle: {
+          width: '100%',
+        },
+      }}
+    >
       <Drawer.Screen name="Tabs" component={TabsScreen} />
     </Drawer.Navigator>
   )
