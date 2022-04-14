@@ -17,7 +17,8 @@ https://stackoverflow.com/questions/44492197/react-native-ios-build-cant-find-no
 - [x] Test out sharing params between parent and children
 - [x] Test out redux dev tools with react navigation
 - [x] Test out tab and headers. Hiding header / updating header from within tabs
-- [ ] Test out drawer navigator and whether it could be used as "split view"
+- [x] Test out drawer navigator and whether it could be used as "split view"
+  - Can in theory work by toggling the "drawerType", but going to be insanely hacky... Not worth it.
 - [ ] Test out how split view works
 - [ ] Test out re-directing to different url
 - [ ] Test out server-rendering

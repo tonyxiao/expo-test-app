@@ -19,7 +19,6 @@ import {
   createBottomTabNavigator,
   BottomTabScreenProps,
 } from '@react-navigation/bottom-tabs'
-import { createDrawerNavigator } from '@react-navigation/drawer'
 import { useReduxDevToolsExtension } from '@react-navigation/devtools'
 
 function Links() {
@@ -113,23 +112,6 @@ const Stack = createNativeStackNavigator<RootParamList>()
 
 const BottomTabs = createBottomTabNavigator<BottomTabsParamList>()
 
-const Drawer = createDrawerNavigator()
-
-function DrawerScreen() {
-  return (
-    <Drawer.Navigator
-      screenOptions={{
-        drawerType: 'permanent',
-        drawerStyle: {
-          width: '100%',
-        },
-      }}
-    >
-      <Drawer.Screen name="Tabs" component={TabsScreen} />
-    </Drawer.Navigator>
-  )
-}
-
 function BottomTabsScreen(
   props: NativeStackScreenProps<RootParamList, 'Home'>
 ) {
@@ -158,7 +140,7 @@ function BottomTabsScreen(
         },
       })}
     >
-      <BottomTabs.Screen name="Tabs" component={DrawerScreen} />
+      <BottomTabs.Screen name="Tabs" component={TabsScreen} />
       <BottomTabs.Screen name="Settings" component={SettingsScreen} />
     </BottomTabs.Navigator>
   )
