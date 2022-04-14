@@ -8,6 +8,7 @@ import {
   useNavigation,
   useNavigationContainerRef,
 } from '@react-navigation/native'
+import { NavigationProp } from '@react-navigation/core'
 import { StyleSheet, Text, View } from 'react-native'
 import {
   createNativeStackNavigator,
@@ -95,6 +96,8 @@ const linking: LinkingOptions<RootParamList> = {
         screens: {
           Tabs: 'tabs',
           Settings: {
+            // `:bookId` here doesn't work in case where navigate action results from
+            // pressing the bottom tab bar, it works after a refresh though
             path: ':bookId/settings',
             exact: true,
           },
@@ -111,7 +114,7 @@ const BottomTabs = createBottomTabNavigator<BottomTabsParamList>()
 
 function BottomTabsScreen() {
   return (
-    <BottomTabs.Navigator>
+    <BottomTabs.Navigator screenOptions={{ headerShown: false }}>
       <BottomTabs.Screen name="Tabs" component={TabsScreen} />
       <BottomTabs.Screen name="Settings" component={SettingsScreen} />
     </BottomTabs.Navigator>
@@ -125,11 +128,35 @@ export default function App() {
   return (
     <NavigationContainer linking={linking} ref={navigationRef as any}>
       <Stack.Navigator>
-        <Stack.Screen name="Home" component={BottomTabsScreen} />
+        <Stack.Screen
+          name="Home"
+          component={BottomTabsScreen}
+          options={({ route, navigation }) => {
+            console.log('home route', route, navigation.getState())
+            const childState = (navigation as NavigationProp<{}>)
+              .getState()
+              .routes.find((r) => r.key === route.key)?.state
+
+            // Nice idea but doesn't always work because child state can be undefined in the very beginning
+            // https://cln.sh/ZL1PHX
+            const childRoute = childState?.routes[childState?.index ?? 0]
+
+            console.log('child', childState, childRoute)
+
+            // debugger
+
+            return {
+              title: `Home: ${childRoute?.name}`,
+            }
+          }}
+        />
         <Stack.Screen
           name="TabDetail"
           component={TabDetailScreen}
           getId={({ params }) => params.tabId}
+          options={({ route }) => ({
+            title: `Book ${route.params.bookId} Tab ${route.params.tabId}`,
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>
