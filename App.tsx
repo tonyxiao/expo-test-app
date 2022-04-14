@@ -20,6 +20,7 @@ import {
   BottomTabScreenProps,
 } from '@react-navigation/bottom-tabs'
 import { useReduxDevToolsExtension } from '@react-navigation/devtools'
+import { useEffect, useLayoutEffect } from 'react'
 
 function Links() {
   const nav = useNavigation()
@@ -79,6 +80,7 @@ function SettingsScreen(
 export type RootParamList = {
   Home: NavigatorScreenParams<BottomTabsParamList>
   TabDetail: { bookId: string; tabId: string }
+  RedirectMe: {}
 }
 
 export type BottomTabsParamList = {
@@ -104,6 +106,7 @@ const linking: LinkingOptions<RootParamList> = {
         },
       },
       TabDetail: ':bookId/tabs/:tabId',
+      RedirectMe: 'redir',
     },
   },
 }
@@ -183,9 +186,25 @@ export default function App() {
             title: `Book ${route.params.bookId} Tab ${route.params.tabId}`,
           })}
         />
+        <Stack.Screen name="RedirectMe">
+          {(props) => <RedirectMe {...props} />}
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   )
+}
+
+function RedirectMe(
+  props: NativeStackScreenProps<RootParamList, 'RedirectMe'>
+) {
+  useLayoutEffect(() => {
+    props.navigation.navigate('Home', {
+      screen: 'Tabs',
+      params: { bookId: '1111' },
+    })
+  }, [props.navigation])
+
+  return null
 }
 
 const styles = StyleSheet.create({
