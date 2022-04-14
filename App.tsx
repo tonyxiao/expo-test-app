@@ -1,15 +1,34 @@
-import { NavigationContainer } from '@react-navigation/native'
 import 'expo-dev-client'
-import { StatusBar } from 'expo-status-bar'
+import { Link, NavigationContainer } from '@react-navigation/native'
 import { StyleSheet, Text, View } from 'react-native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+
+function HomeScreen() {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Home Screen</Text>
+      <Link to={{ screen: 'Settings' }}>Go to settings screen</Link>
+    </View>
+  )
+}
+
+function SettingsScreen() {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Settings Screen</Text>
+    </View>
+  )
+}
+
+const Stack = createNativeStackNavigator()
 
 export default function App() {
   return (
     <NavigationContainer>
-      <View style={styles.container}>
-        <Text>Open up App.tsx to start working on your app! Inside nav container</Text>
-        <StatusBar style="auto" />
-      </View>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+      </Stack.Navigator>
     </NavigationContainer>
   )
 }
