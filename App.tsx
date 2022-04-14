@@ -118,23 +118,27 @@ function BottomTabsScreen(
   return (
     <BottomTabs.Navigator
       screenOptions={{ headerShown: false }}
-      screenListeners={{
-        state: (e) => {
-          // console.log(args)e
-          const state = (e.data as any)?.state as NavigationState<{}>
-          const childRoute = state?.routes[state?.index ?? 0]
+      screenListeners={({ route }) => ({
+        // state: (e) => {
+        //   // console.log(args)e
+        //   const state = (e.data as any)?.state as NavigationState<{}>
+        //   const childRoute = state?.routes[state?.index ?? 0]
 
+        //   props.navigation.setOptions({
+        //     title: `Home: ${childRoute.name}`,
+        //   })
+
+        //   // debugger
+        // },
+        focus: (..._args) => {
           props.navigation.setOptions({
-            title: `Home: ${childRoute.name}`,
+            title: `Home: ${route.name}`,
           })
+          // console.log(args)
 
           // debugger
         },
-        focus: (...args) => {
-          console.log(args)
-          // debugger
-        },
-      }}
+      })}
     >
       <BottomTabs.Screen name="Tabs" component={TabsScreen} />
       <BottomTabs.Screen name="Settings" component={SettingsScreen} />
