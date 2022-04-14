@@ -19,10 +19,10 @@ function Links() {
     <View style={{ marginTop: 30 }}>
       <Link to={{ screen: 'Tabs' }}>Go to tabs screen</Link>
       <Link to={{ screen: 'Settings' }}>Go to settings screen</Link>
-      <Link to={{ screen: 'TabDetail', params: { tabId: '1' } }}>
+      <Link to={{ screen: 'TabDetail', params: { bookId: '333', tabId: '1' } }}>
         Go to tab 1
       </Link>
-      <Link to={{ screen: 'TabDetail', params: { tabId: '2' } }}>
+      <Link to={{ screen: 'TabDetail', params: { bookId: '333', tabId: '2' } }}>
         Go to tab 2
       </Link>
     </View>
@@ -59,8 +59,8 @@ function SettingsScreen() {
 }
 
 export type RootParamList = {
-  Tabs: {}
-  TabDetail: { tabId: string }
+  Tabs: { bookId: string }
+  TabDetail: { bookId: string; tabId: string }
   Settings: {}
 }
 
@@ -69,8 +69,8 @@ const linking: LinkingOptions<RootParamList> = {
   config: {
     initialRouteName: 'Tabs',
     screens: {
-      Tabs: 'tabs',
-      TabDetail: 'tabs/:tabId',
+      Tabs: ':bookId/tabs',
+      TabDetail: ':bookId/tabs/:tabId',
       Settings: 'settings',
     },
   },
@@ -82,7 +82,11 @@ export default function App() {
   return (
     <NavigationContainer linking={linking}>
       <Stack.Navigator>
-        <Stack.Screen name="Tabs" component={TabsScreen} />
+        <Stack.Screen
+          name="Tabs"
+          component={TabsScreen}
+          initialParams={{ bookId: '123' }}
+        />
         <Stack.Screen
           name="TabDetail"
           component={TabDetailScreen}
