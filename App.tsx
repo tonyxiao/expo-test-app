@@ -6,6 +6,7 @@ import {
   NavigationContainer,
   NavigatorScreenParams,
   useNavigation,
+  useNavigationContainerRef,
 } from '@react-navigation/native'
 import { StyleSheet, Text, View } from 'react-native'
 import {
@@ -17,6 +18,7 @@ import {
   createBottomTabNavigator,
   BottomTabScreenProps,
 } from '@react-navigation/bottom-tabs'
+import { useReduxDevToolsExtension } from '@react-navigation/devtools'
 
 function Links() {
   const nav = useNavigation()
@@ -89,10 +91,10 @@ const linking: LinkingOptions<RootParamList> = {
     initialRouteName: 'Home',
     screens: {
       Home: {
-        path: '',
+        path: ':bookId',
         screens: {
-          Tabs: ':bookId/tabs',
-          Settings: ':bookId/settings',
+          Tabs: 'tabs',
+          Settings: 'settings',
         },
       },
       TabDetail: ':bookId/tabs/:tabId',
@@ -114,8 +116,11 @@ function BottomTabsScreen() {
 }
 
 export default function App() {
+  const navigationRef = useNavigationContainerRef()
+  useReduxDevToolsExtension(navigationRef)
+
   return (
-    <NavigationContainer linking={linking}>
+    <NavigationContainer linking={linking} ref={navigationRef}>
       <Stack.Navigator>
         <Stack.Screen name="Home" component={BottomTabsScreen} />
         <Stack.Screen

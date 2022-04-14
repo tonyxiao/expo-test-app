@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@react-navigation/bottom-tabs": "^6.3.1",
+    "@react-navigation/devtools": "^6.0.7",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/native-stack": "^6.6.1",
     "expo": "~44.0.0",
