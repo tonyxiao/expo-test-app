@@ -8,7 +8,7 @@ import {
   useNavigation,
   useNavigationContainerRef,
 } from '@react-navigation/native'
-import { NavigationProp } from '@react-navigation/core'
+import { NavigationProp, NavigationState } from '@react-navigation/core'
 import { StyleSheet, Text, View } from 'react-native'
 import {
   createNativeStackNavigator,
@@ -112,9 +112,30 @@ const Stack = createNativeStackNavigator<RootParamList>()
 
 const BottomTabs = createBottomTabNavigator<BottomTabsParamList>()
 
-function BottomTabsScreen() {
+function BottomTabsScreen(
+  props: NativeStackScreenProps<RootParamList, 'Home'>
+) {
   return (
-    <BottomTabs.Navigator screenOptions={{ headerShown: false }}>
+    <BottomTabs.Navigator
+      screenOptions={{ headerShown: false }}
+      screenListeners={{
+        state: (e) => {
+          // console.log(args)e
+          const state = (e.data as any)?.state as NavigationState<{}>
+          const childRoute = state?.routes[state?.index ?? 0]
+
+          props.navigation.setOptions({
+            title: `Home: ${childRoute.name}`,
+          })
+
+          // debugger
+        },
+        focus: (...args) => {
+          console.log(args)
+          // debugger
+        },
+      }}
+    >
       <BottomTabs.Screen name="Tabs" component={TabsScreen} />
       <BottomTabs.Screen name="Settings" component={SettingsScreen} />
     </BottomTabs.Navigator>
@@ -131,24 +152,24 @@ export default function App() {
         <Stack.Screen
           name="Home"
           component={BottomTabsScreen}
-          options={({ route, navigation }) => {
-            console.log('home route', route, navigation.getState())
-            const childState = (navigation as NavigationProp<{}>)
-              .getState()
-              .routes.find((r) => r.key === route.key)?.state
+          // options={({ route, navigation }) => {
+          //   console.log('home route', route, navigation.getState())
+          //   const childState = (navigation as NavigationProp<{}>)
+          //     .getState()
+          //     .routes.find((r) => r.key === route.key)?.state
 
-            // Nice idea but doesn't always work because child state can be undefined in the very beginning
-            // https://cln.sh/ZL1PHX
-            const childRoute = childState?.routes[childState?.index ?? 0]
+          //   // Nice idea but doesn't always work because child state can be undefined in the very beginning
+          //   // https://cln.sh/ZL1PHX
+          //   const childRoute = childState?.routes[childState?.index ?? 0]
 
-            console.log('child', childState, childRoute)
+          //   console.log('child', childState, childRoute)
 
-            // debugger
+          //   // debugger
 
-            return {
-              title: `Home: ${childRoute?.name}`,
-            }
-          }}
+          //   return {
+          //     title: `Home: ${childRoute?.name}`,
+          //   }
+          // }}
         />
         <Stack.Screen
           name="TabDetail"
