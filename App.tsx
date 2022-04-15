@@ -125,9 +125,8 @@ const linking: LinkingOptions<RootParamList> = {
     initialRouteName: 'Home',
     screens: {
       Home: {
-        path: ':bookId',
         screens: {
-          Tabs: 'tabs',
+          Tabs: ':bookId/tabs',
           Settings: {
             // `:bookId` here doesn't work in case where navigate action results from
             // pressing the bottom tab bar, it works after a refresh though
@@ -175,15 +174,28 @@ function BottomTabsScreen(
         },
       })}
     >
-      <BottomTabs.Screen name="Tabs" component={TabsScreen} />
-      <BottomTabs.Screen name="Settings" component={SettingsScreen} />
+      <BottomTabs.Screen
+        name="Tabs"
+        component={TabsScreen}
+        initialParams={{ bookId: '111' }}
+      />
+      <BottomTabs.Screen
+        name="Settings"
+        component={SettingsScreen}
+        initialParams={{ bookId: '111' }}
+      />
     </BottomTabs.Navigator>
   )
 }
 
-function RootStackScreen() {
+function RootStackScreen(
+  props: Omit<
+    React.ComponentPropsWithoutRef<typeof Stack.Navigator>,
+    'children'
+  >
+) {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator {...props}>
       <Stack.Screen
         name="Home"
         component={BottomTabsScreen}
@@ -230,26 +242,49 @@ function RootStackScreen() {
 }
 
 export default function App() {
-  const navigationRef = useNavigationContainerRef()
+  const navigationRef = useNavigationContainerRef<RootParamList>()
   useReduxDevToolsExtension(navigationRef)
 
   return (
-    <SplitView
-      master={
-        <NavigationContainer>
-          <RootStackScreen />
-        </NavigationContainer>
-      }
-      detail={
-        <NavigationContainer linking={linking} ref={navigationRef as any}>
-          {/* Master view, only shown if we have space */}
+    <NavigationContainer linking={linking} ref={navigationRef as any}>
+      <SplitView
+        master={
+          <NavigationContainer independent>
+            <RootStackScreen
+              screenListeners={({ route }) => ({
+                state: (e) => {
+                  console.log('e', e)
+                  // ;(e as any).preventDefault()
+                },
+                blur: (e) => {
+                  console.log('blur', e, route)
+                  // ;(e as any).preventDefault()
+                },
+                focus: (e) => {
+                  console.log('focus', e, route)
+                  // Sync the navigation
+                  navigationRef.navigate(route.name, route.params)
+                  // ;(e as any).preventDefault()
+                },
 
+                beforeRemove: (e) => {
+                  console.log('beforeRemove', e)
+                  // ;(e as any).preventDefault()
+                },
+              })}
+            />
+          </NavigationContainer>
+        }
+        detail={
           <RootStackScreen />
-          {/* Detail view */}
-          {/* <RootStackScreen /> */}
-        </NavigationContainer>
-      }
-    />
+
+          // {/* Master view, only shown if we have space */}
+
+          // {/* Detail view */}
+          // {/* <RootStackScreen /> */}
+        }
+      />
+    </NavigationContainer>
   )
 }
 
