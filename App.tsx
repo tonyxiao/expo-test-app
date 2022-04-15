@@ -39,6 +39,23 @@ function Links() {
       <Link to={{ screen: 'TabDetail', params: { bookId: '333', tabId: '2' } }}>
         Go to tab 2
       </Link>
+
+      <Link
+        to={{
+          screen: 'Transaction',
+          params: { bookId: '333', tabId: '2', transactionId: 'afd' },
+        }}
+      >
+        Go to transaction afd
+      </Link>
+      <Link
+        to={{
+          screen: 'Transaction',
+          params: { bookId: '333', tabId: '2', transactionId: 'zzz' },
+        }}
+      >
+        Go to transaction zzz
+      </Link>
     </View>
   )
 }
@@ -65,6 +82,18 @@ function TabDetailScreen(
   )
 }
 
+function TransactionScreen(
+  props: NativeStackScreenProps<RootParamList, 'Transaction'>
+) {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Transaction: {props.route.params.transactionId}</Text>
+      <Text>{JSON.stringify(props.route, null, 4)}</Text>
+      <Links />
+    </View>
+  )
+}
+
 function SettingsScreen(
   props: BottomTabScreenProps<BottomTabsParamList, 'Settings'>
 ) {
@@ -80,6 +109,7 @@ function SettingsScreen(
 export type RootParamList = {
   Home: NavigatorScreenParams<BottomTabsParamList>
   TabDetail: { bookId: string; tabId: string }
+  Transaction: { bookId: string; tabId: string; transactionId: string }
   RedirectMe: {}
 }
 
@@ -106,6 +136,7 @@ const linking: LinkingOptions<RootParamList> = {
         },
       },
       TabDetail: ':bookId/tabs/:tabId',
+      Transaction: ':bookId/tabs/:tabId/transactions/:transactionId',
       RedirectMe: 'redir',
     },
   },
@@ -184,6 +215,14 @@ export default function App() {
           getId={({ params }) => params.tabId}
           options={({ route }) => ({
             title: `Book ${route.params.bookId} Tab ${route.params.tabId}`,
+          })}
+        />
+        <Stack.Screen
+          name="Transaction"
+          component={TransactionScreen}
+          getId={({ params }) => params.transactionId}
+          options={({ route }) => ({
+            title: `Book ${route.params.bookId} Tab ${route.params.tabId} Txn ${route.params.transactionId}`,
           })}
         />
         <Stack.Screen name="RedirectMe">
