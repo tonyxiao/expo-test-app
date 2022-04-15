@@ -21,6 +21,7 @@ import {
 } from '@react-navigation/bottom-tabs'
 import { useReduxDevToolsExtension } from '@react-navigation/devtools'
 import { useEffect, useLayoutEffect } from 'react'
+import { SplitView } from './SplitView'
 
 function Links() {
   const nav = useNavigation()
@@ -180,56 +181,75 @@ function BottomTabsScreen(
   )
 }
 
+function RootStackScreen() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Home"
+        component={BottomTabsScreen}
+        // options={({ route, navigation }) => {
+        //   console.log('home route', route, navigation.getState())
+        //   const childState = (navigation as NavigationProp<{}>)
+        //     .getState()
+        //     .routes.find((r) => r.key === route.key)?.state
+
+        //   // Nice idea but doesn't always work because child state can be undefined in the very beginning
+        //   // https://cln.sh/ZL1PHX
+        //   const childRoute = childState?.routes[childState?.index ?? 0]
+
+        //   console.log('child', childState, childRoute)
+
+        //   // debugger
+
+        //   return {
+        //     title: `Home: ${childRoute?.name}`,
+        //   }
+        // }}
+      />
+      <Stack.Screen
+        name="TabDetail"
+        component={TabDetailScreen}
+        getId={({ params }) => params.tabId}
+        options={({ route }) => ({
+          title: `Book ${route.params.bookId} Tab ${route.params.tabId}`,
+        })}
+      />
+      <Stack.Screen
+        name="Transaction"
+        component={TransactionScreen}
+        getId={({ params }) => params.transactionId}
+        options={({ route }) => ({
+          title: `Book ${route.params.bookId} Tab ${route.params.tabId} Txn ${route.params.transactionId}`,
+        })}
+      />
+      <Stack.Screen name="RedirectMe">
+        {(props) => <RedirectMe {...props} />}
+      </Stack.Screen>
+    </Stack.Navigator>
+  )
+}
+
 export default function App() {
   const navigationRef = useNavigationContainerRef()
   useReduxDevToolsExtension(navigationRef)
 
   return (
-    <NavigationContainer linking={linking} ref={navigationRef as any}>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Home"
-          component={BottomTabsScreen}
-          // options={({ route, navigation }) => {
-          //   console.log('home route', route, navigation.getState())
-          //   const childState = (navigation as NavigationProp<{}>)
-          //     .getState()
-          //     .routes.find((r) => r.key === route.key)?.state
+    <SplitView
+      master={
+        <NavigationContainer>
+          <RootStackScreen />
+        </NavigationContainer>
+      }
+      detail={
+        <NavigationContainer linking={linking} ref={navigationRef as any}>
+          {/* Master view, only shown if we have space */}
 
-          //   // Nice idea but doesn't always work because child state can be undefined in the very beginning
-          //   // https://cln.sh/ZL1PHX
-          //   const childRoute = childState?.routes[childState?.index ?? 0]
-
-          //   console.log('child', childState, childRoute)
-
-          //   // debugger
-
-          //   return {
-          //     title: `Home: ${childRoute?.name}`,
-          //   }
-          // }}
-        />
-        <Stack.Screen
-          name="TabDetail"
-          component={TabDetailScreen}
-          getId={({ params }) => params.tabId}
-          options={({ route }) => ({
-            title: `Book ${route.params.bookId} Tab ${route.params.tabId}`,
-          })}
-        />
-        <Stack.Screen
-          name="Transaction"
-          component={TransactionScreen}
-          getId={({ params }) => params.transactionId}
-          options={({ route }) => ({
-            title: `Book ${route.params.bookId} Tab ${route.params.tabId} Txn ${route.params.transactionId}`,
-          })}
-        />
-        <Stack.Screen name="RedirectMe">
-          {(props) => <RedirectMe {...props} />}
-        </Stack.Screen>
-      </Stack.Navigator>
-    </NavigationContainer>
+          <RootStackScreen />
+          {/* Detail view */}
+          {/* <RootStackScreen /> */}
+        </NavigationContainer>
+      }
+    />
   )
 }
 
