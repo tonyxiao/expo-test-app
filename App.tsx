@@ -1,5 +1,8 @@
-import 'expo-dev-client'
-import * as Linking from 'expo-linking'
+import {
+  BottomTabScreenProps,
+  createBottomTabNavigator,
+} from '@react-navigation/bottom-tabs'
+import { useReduxDevToolsExtension } from '@react-navigation/devtools'
 import {
   Link,
   LinkingOptions,
@@ -8,19 +11,14 @@ import {
   useNavigation,
   useNavigationContainerRef,
 } from '@react-navigation/native'
-import { NavigationProp, NavigationState } from '@react-navigation/core'
-import { StyleSheet, Text, View } from 'react-native'
 import {
   createNativeStackNavigator,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack'
-
-import {
-  createBottomTabNavigator,
-  BottomTabScreenProps,
-} from '@react-navigation/bottom-tabs'
-import { useReduxDevToolsExtension } from '@react-navigation/devtools'
-import { useEffect, useLayoutEffect } from 'react'
+import 'expo-dev-client'
+import * as Linking from 'expo-linking'
+import { useLayoutEffect } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 import { SplitView } from './SplitView'
 
 function Links() {
@@ -37,9 +35,8 @@ function Links() {
       <Link to={{ screen: 'TabDetail', params: { bookId: '333', tabId: '1' } }}>
         Go to tab 1
       </Link>
-      <Link to={{ screen: 'TabDetail', params: { bookId: '333', tabId: '2' } }}>
-        Go to tab 2
-      </Link>
+      {/* This will not work in the independant navigation container */}
+      <Link to={`/333/tabs/233`}>Go to tab 2</Link>
 
       <Link
         to={{
