@@ -1,6 +1,7 @@
 import 'expo-dev-client'
 import * as Linking from 'expo-linking'
 import {
+  createNavigationContainerRef,
   Link,
   LinkingOptions,
   NavigationContainer,
@@ -19,6 +20,7 @@ import {
   BottomTabScreenProps,
 } from '@react-navigation/bottom-tabs'
 import { useReduxDevToolsExtension } from '@react-navigation/devtools'
+import { useEffect, useState } from 'react'
 
 function Links() {
   const nav = useNavigation()
@@ -118,20 +120,52 @@ function BottomTabsScreen() {
   )
 }
 
+const navigationRef = createNavigationContainerRef()
+;(window as any).navRef = navigationRef
+
+export function useNavigationoute() {
+  const [route, setRoute] = useState(navigationRef.getCurrentRoute())
+  useEffect(
+    () =>
+      navigationRef.addListener('state', () =>
+        setRoute(navigationRef.getCurrentRoute())
+      ),
+    []
+  )
+  return route
+}
+
+function GetRoute() {
+  const route = useNavigationoute()
+  console.log({route})
+  return null
+}
+
 export default function App() {
-  const navigationRef = useNavigationContainerRef()
   useReduxDevToolsExtension(navigationRef)
+  const [ready, setReady] = useState(false)
 
   return (
-    <NavigationContainer linking={linking} ref={navigationRef as any}>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={BottomTabsScreen} />
+    <NavigationContainer
+      linking={linking}
+      ref={navigationRef as any}
+      onReady={() => {
+        console.log(
+          'onReady : navigationRef.isReady()',
+          navigationRef.isReady()
+        )
+        setReady(true)
+      }}
+    >
+        {ready && <GetRoute />}
+      {/* <Stack.Navigator> */}
+        {/* <Stack.Screen name="Home" component={BottomTabsScreen} />
         <Stack.Screen
           name="TabDetail"
           component={TabDetailScreen}
           getId={({ params }) => params.tabId}
-        />
-      </Stack.Navigator>
+        /> */}
+      {/* </Stack.Navigator> */}
     </NavigationContainer>
   )
 }
