@@ -8,6 +8,7 @@ import {
   NavigatorScreenParams,
   useNavigation,
   useNavigationContainerRef,
+  useNavigationState,
 } from '@react-navigation/native'
 import { StyleSheet, Text, View } from 'react-native'
 import {
@@ -20,7 +21,7 @@ import {
   BottomTabScreenProps,
 } from '@react-navigation/bottom-tabs'
 import { useReduxDevToolsExtension } from '@react-navigation/devtools'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 function Links() {
   const nav = useNavigation()
@@ -93,7 +94,6 @@ const linking: LinkingOptions<RootParamList> = {
     initialRouteName: 'Home',
     screens: {
       Home: {
-        path: ':bookId',
         screens: {
           Tabs: 'tabs',
           Settings: {
@@ -135,10 +135,61 @@ export function useNavigationoute() {
   return route
 }
 
-function GetRoute() {
+function GetRoute(props: { ready: boolean }) {
+  const navigation = useNavigation()
+  const state = useNavigationState((s) => s)
   const route = useNavigationoute()
-  console.log({route})
+  console.log({ ...props, route, state, navigation })
   return null
+}
+
+function useCurrentRouteParam(key: string) {
+  return useNavigationState((s) => {
+    if (!s) {
+      return undefined
+    }
+
+    function findFocusedRoute() {
+      let current = s
+
+      while (current?.routes[current.index ?? 0].state != null) {
+        // @ts-ignore
+        current = current.routes[current.index ?? 0].state
+      }
+      const route = current?.routes[current?.index ?? 0]
+
+      return route
+    }
+    // @ts-ignore
+    return findFocusedRoute().params?.[key] as string
+    // return s.routes[s.index ?? s.routes.length - 1].params
+  })
+}
+
+function HandleTokens({ children }: { children: React.ReactNode }) {
+  const navigation = useNavigation()
+  const token = useCurrentRouteParam('token')
+  const [handled, setHandled] = useState(false)
+
+  useEffect(() => {
+    if (!token) {
+      return
+    }
+    if (!handled) {
+      setTimeout(() => {
+        setHandled(true)
+        // navigation.setParams({ token: undefined })
+      }, 2000)
+    } else {
+      navigation.setParams({ token: undefined })
+    }
+  }, [token, handled])
+
+  if (token && !handled) {
+    return <div>Loading token...</div>
+  }
+
+  return <>{children}</>
 }
 
 export default function App() {
@@ -157,15 +208,17 @@ export default function App() {
         setReady(true)
       }}
     >
-        {ready && <GetRoute />}
-      {/* <Stack.Navigator> */}
-        {/* <Stack.Screen name="Home" component={BottomTabsScreen} />
-        <Stack.Screen
-          name="TabDetail"
-          component={TabDetailScreen}
-          getId={({ params }) => params.tabId}
-        /> */}
-      {/* </Stack.Navigator> */}
+      <HandleTokens>
+        <GetRoute ready={ready} />
+        <Stack.Navigator>
+          <Stack.Screen name="Home" component={BottomTabsScreen} />
+          <Stack.Screen
+            name="TabDetail"
+            component={TabDetailScreen}
+            getId={({ params }) => params.tabId}
+          />
+        </Stack.Navigator>
+      </HandleTokens>
     </NavigationContainer>
   )
 }
